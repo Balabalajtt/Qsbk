@@ -2,12 +2,13 @@ package com.example.qsbk;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
+import android.widget.Toast;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -25,14 +26,19 @@ public class MainActivity extends AppCompatActivity {
     private List<Joke> mJokeList = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
-    JokeAdapter mJokeAdapter;
+    private JokeAdapter mJokeAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-
-    Handler handler = new Handler(){
+    private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+
+            if (!mJokeList.isEmpty()) {
+                mJokeAdapter.notifyDataSetChanged();
+            }
             mJokeAdapter.notifyDataSetChanged();
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     };
 
@@ -42,60 +48,67 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //初始recyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mJokeAdapter = new JokeAdapter(mJokeList, this);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mJokeAdapter);
 
+        //刷新
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestData();
+            }
+        });
+
+        requestData();
+
+    }
+
+    public void requestData() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String yurl = "https://www.qiushibaike.com/8hr/page/";
-                Connection conn;
-                for (int i = 1; i < 2; i++) {
+                mJokeList.clear();
+                for (int i = 1; i < 5; i++) {
+                    Connection conn;
                     String url = yurl + i;
                     conn = Jsoup.connect(url);
-                    conn.header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0");
+                    conn.header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/    20100101 Firefox/32.0");//伪装浏览器获取
                     Document doc = null;
                     try {
                         doc = conn.get();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "获取失败", Toast.LENGTH_SHORT).show();
                     }
+
+                    //解析加载数据
+                    assert doc != null;
                     Elements elements = doc.select("div.article");
-                    mJokeList.clear();
+
                     for (Element element : elements) {
-                        String joke = element.getElementsByTag("span").first().text();
-                        String img = element.select("img.illustration").attr("src");
-                        Log.d("lala", "run: " + img + mJokeList.size());
+                        Joke joke = new Joke();
 
-                        Joke j = new Joke();
-                        j.setJokeText(joke);
-                        if (!img.equals("")) {
-                            j.setJokeImageUrl("http:" + img);
+                        String text = element.getElementsByTag("span").first().text();
+                        String image = element.select("img.illustration").attr("src");
+
+                        joke.setJokeText(text);
+                        if (!image.equals("")) {
+                            joke.setJokeImageUrl("http:" + image);
                         }
-                        if (!TextUtils.isEmpty(joke)) {
-                            mJokeList.add(j);
+                        if (!TextUtils.isEmpty(text)) {
+                            mJokeList.add(joke);
                         }
-                        Log.d("123", "run: " + j.getJokeImageUrl());
                     }
-
                 }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        if (!mJokeList.isEmpty()) {
-                            mJokeAdapter.notifyDataSetChanged();
-                        }
-                    }
-                });
                 handler.sendEmptyMessage(0);
             }
         }).start();
-
     }
 
 }

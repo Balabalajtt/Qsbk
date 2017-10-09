@@ -2,7 +2,6 @@ package com.example.qsbk;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +49,6 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
     public void onBindViewHolder(JokeAdapter.ViewHolder holder, int position) {
         Joke joke = mJokeList.get(position);
         holder.jokeText.setText(joke.getJokeText());
-        Log.d("555222", "onBindViewHolder: " + mJokeList.size());
         if (joke.getJokeImageUrl() != null) {
             holder.jokeImage.setVisibility(View.VISIBLE);
             Glide.with(mContext).load(joke.getJokeImageUrl()).into(holder.jokeImage);
@@ -63,6 +61,5 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
     public int getItemCount() {
         return mJokeList.size();
     }
-
 
 }
