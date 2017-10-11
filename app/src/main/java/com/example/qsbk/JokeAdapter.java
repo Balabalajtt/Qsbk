@@ -20,6 +20,7 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
 
     private List<Joke> mJokeList;
     private Context mContext;
+    private OnItemClickListener mOnItemClickListener;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView jokeText;
@@ -46,7 +47,7 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(JokeAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final JokeAdapter.ViewHolder holder, final int position) {
         Joke joke = mJokeList.get(position);
         holder.jokeText.setText(joke.getJokeText());
         if (joke.getJokeImageUrl() != null) {
@@ -55,11 +56,30 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
         } else {
             holder.jokeImage.setVisibility(View.GONE);
         }
+
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = holder.getLayoutPosition();
+                    mOnItemClickListener.onItemClick(holder.itemView, pos);
+                }
+            });
+
+        }
     }
 
     @Override
     public int getItemCount() {
         return mJokeList.size();
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
+        this.mOnItemClickListener = mOnItemClickListener;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.qsbk;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -7,8 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.View;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -54,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
         mJokeAdapter = new JokeAdapter(mJokeList, this);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mJokeAdapter);
+        mJokeAdapter.setOnItemClickListener(new JokeAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("joke", mJokeList.get(position));
+                startActivity(intent);
+            }
+        });
 
         //刷新
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -74,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 String yurl = "https://www.qiushibaike.com/8hr/page/";
                 mJokeList.clear();
-                for (int i = 1; i < 5; i++) {
+                for (int i = 1; i < 2; i++) {
+
                     Connection conn;
                     String url = yurl + i;
                     conn = Jsoup.connect(url);
@@ -84,28 +94,48 @@ public class MainActivity extends AppCompatActivity {
                         doc = conn.get();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(MainActivity.this, "获取失败", Toast.LENGTH_SHORT).show();
                     }
 
                     //解析加载数据
                     assert doc != null;
-                    Elements elements = doc.select("div.article");
-
-                    for (Element element : elements) {
+                    Elements elements = doc.getElementsByClass("article");
+                    for (Element ele : elements) {
                         Joke joke = new Joke();
 
-                        String text = element.getElementsByTag("span").first().text();
-                        String image = element.select("img.illustration").attr("src");
 
+                        //详细页网址
+                        Elements deu = ele.getElementsByTag("a");
+                        for (Element e : deu) {
+                            if (e.attr("href").length() > 15 && e.attr("href").substring(0,3).equals("/ar")) {
+                                joke.setDetailUrl("https://www.qiushibaike.com" + e.attr("href"));
+                                break;
+                            }
+                        }
+
+
+                        //段子内容
+                        Elements eee = ele.getElementsByClass("content");
+                        String text = eee.get(0).getElementsByTag("span").first().text();
                         joke.setJokeText(text);
+
+
+                        //配图
+                        String image = ele.select("img.illustration").attr("src");
                         if (!image.equals("")) {
                             joke.setJokeImageUrl("http:" + image);
                         }
-                        if (!TextUtils.isEmpty(text)) {
-                            mJokeList.add(joke);
-                        }
+
+                        mJokeList.add(joke);
+
+                        Log.d("test123", "run: " + joke.getDetailUrl() );
+                        Log.d("test123", "run: " + joke.getJokeText());
+                        Log.d("test123", "run: " + joke.getJokeImageUrl());
+                        Log.d("test123", "run: " + "-----------------------------");
+
                     }
+
                 }
+
                 handler.sendEmptyMessage(0);
             }
         }).start();
