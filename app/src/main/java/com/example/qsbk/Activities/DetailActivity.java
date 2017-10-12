@@ -1,5 +1,6 @@
-package com.example.qsbk;
+package com.example.qsbk.Activities;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -7,11 +8,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.example.qsbk.Adapters.MultipleItemAdapter;
+import com.example.qsbk.Beans.Comment;
+import com.example.qsbk.Beans.Joke;
+import com.example.qsbk.Beans.JokeDetail;
+import com.example.qsbk.R;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -25,24 +27,30 @@ import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private TextView mTextView;
-    private ImageView mImageView;
+    private Context mContext;
+
+    private JokeDetail mJokeDetail;
+
+    private RecyclerView mRecyclerView;
+
+    private List<Comment> mCommentList = new ArrayList<>();
 
     private String detailUrl = "";
-    private RecyclerView mRecyclerView;
-    private List<Comment> mCommentList = new ArrayList<>();
-    private LinearLayoutManager mLinearLayoutManager;
-    private CommentAdapter mCommentAdapter;
 
-    private Handler handler = new Handler(){
+    private LinearLayoutManager mLinearLayoutManager;
+
+    private MultipleItemAdapter mMultipleItemAdapter;
+
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-
-            if (!mCommentList.isEmpty()) {
-                mCommentAdapter.notifyDataSetChanged();
-            }
-            mCommentAdapter.notifyDataSetChanged();
+            mRecyclerView = (RecyclerView) findViewById(R.id.detail_recycler_view);
+            mLinearLayoutManager = new LinearLayoutManager(mContext);
+            mMultipleItemAdapter = new MultipleItemAdapter(mContext, mJokeDetail);
+            mRecyclerView.setLayoutManager(mLinearLayoutManager);
+            mRecyclerView.setAdapter(mMultipleItemAdapter);
+            mMultipleItemAdapter.notifyDataSetChanged();
         }
     };
 
@@ -50,35 +58,18 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        mContext = this;
 
         Joke joke = (Joke) getIntent().getSerializableExtra("joke");
         detailUrl = joke.getDetailUrl();
-        mTextView = (TextView) findViewById(R.id.detail_text_view);
-        mImageView = (ImageView) findViewById(R.id.detail_image_view);
-        mTextView.setText(joke.getJokeText());
-        if (joke.getJokeImageUrl() != null) {
-            mImageView.setVisibility(View.VISIBLE);
-            Glide.with(this).load(joke.getJokeImageUrl()).into(mImageView);
-        } else {
-            mImageView.setVisibility(View.GONE);
-        }
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.comment_recycler_view);
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        mCommentAdapter = new CommentAdapter(mCommentList);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-        mRecyclerView.setAdapter(mCommentAdapter);
-        mRecyclerView.setNestedScrollingEnabled(false);//解决嵌套卡顿
+        mJokeDetail = new JokeDetail();
+        mJokeDetail.setJokeImage(joke.getJokeImageUrl());
+        mJokeDetail.setJokeStatus(joke.getJokeStatus());
 
-        for (int i = 0; i < 50; i++) {
-            Comment c = new Comment();
-            c.setCommentBody("************");
-            mCommentList.add(c);
-        }
-        mCommentList.clear();
         requestDate();
 
-        mCommentAdapter.notifyDataSetChanged();
+//        mRecyclerView.setNestedScrollingEnabled(false);//解决嵌套卡顿
 
     }
 
@@ -102,7 +93,7 @@ public class DetailActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mTextView.setText(es.get(0).text());
+                        mJokeDetail.setJokeText(es.get(0).text());
                     }
                 });
 
@@ -113,14 +104,12 @@ public class DetailActivity extends AppCompatActivity {
                     Comment c = new Comment();
                     c.setCommentBody(e.select("span").text());
                     mCommentList.add(c);
-                    Log.d("666", "run: " + c.getCommentBody());
-
                 }
+                mJokeDetail.setCommentList(mCommentList);
+                Log.d("666", "run: " + mJokeDetail.getCommentList().size());
                 handler.sendEmptyMessage(0);
             }
         }).start();
     }
-
-
 
 }

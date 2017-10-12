@@ -1,4 +1,4 @@
-package com.example.qsbk;
+package com.example.qsbk.Beans;
 
 /**
  * Created by 江婷婷 on 2017/10/11.
@@ -6,6 +6,7 @@ package com.example.qsbk;
 
 public class Comment {
     private String commentBody;
+
     private int report;
 
     public String getCommentBody() {
@@ -23,4 +24,5 @@ public class Comment {
     public void setReport(int report) {
         this.report = report;
     }
+
 }

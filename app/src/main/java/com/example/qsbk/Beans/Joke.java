@@ -1,7 +1,6 @@
-package com.example.qsbk;
+package com.example.qsbk.Beans;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by 江婷婷 on 2017/10/9.
@@ -14,7 +13,15 @@ public class Joke implements Serializable {
 
     private String detailUrl;
 
-    private List<Comment> commentList;
+    private String jokeStatus;
+
+    public String getJokeStatus() {
+        return jokeStatus;
+    }
+
+    public void setJokeStatus(String jokeStatus) {
+        this.jokeStatus = jokeStatus;
+    }
 
     public String getJokeText() {
         return jokeText;
@@ -38,14 +45,6 @@ public class Joke implements Serializable {
 
     public void setDetailUrl(String detailUrl) {
         this.detailUrl = detailUrl;
-    }
-
-    public List<Comment> getCommentList() {
-        return commentList;
-    }
-
-    public void setCommentList(List<Comment> commentList) {
-        this.commentList = commentList;
     }
 
 }

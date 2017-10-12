@@ -1,4 +1,4 @@
-package com.example.qsbk;
+package com.example.qsbk.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.qsbk.Beans.Joke;
+import com.example.qsbk.R;
 
 import java.util.List;
 
@@ -25,11 +27,13 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
     static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView jokeText;
         private ImageView jokeImage;
+        private TextView jokeStatus;
 
         public ViewHolder(View itemView) {
             super(itemView);
             jokeText = (TextView) itemView.findViewById(R.id.joke_text);
             jokeImage = (ImageView) itemView.findViewById(R.id.joke_image);
+            jokeStatus = (TextView) itemView.findViewById(R.id.joke_status);
         }
     }
 
@@ -50,6 +54,7 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
     public void onBindViewHolder(final JokeAdapter.ViewHolder holder, final int position) {
         Joke joke = mJokeList.get(position);
         holder.jokeText.setText(joke.getJokeText());
+        holder.jokeStatus.setText(joke.getJokeStatus());
         if (joke.getJokeImageUrl() != null) {
             holder.jokeImage.setVisibility(View.VISIBLE);
             Glide.with(mContext).load(joke.getJokeImageUrl()).into(holder.jokeImage);
