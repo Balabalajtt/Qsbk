@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.qsbk.Beans.Joke;
 import com.example.qsbk.R;
+import com.example.qsbk.Utils.GlideCircleTransform;
 
 import java.util.List;
 
@@ -28,12 +29,16 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
         private TextView jokeText;
         private ImageView jokeImage;
         private TextView jokeStatus;
+        private ImageView authorImage;
+        private TextView authorName;
 
         public ViewHolder(View itemView) {
             super(itemView);
             jokeText = (TextView) itemView.findViewById(R.id.joke_text);
             jokeImage = (ImageView) itemView.findViewById(R.id.joke_image);
             jokeStatus = (TextView) itemView.findViewById(R.id.joke_status);
+            authorName = (TextView) itemView.findViewById(R.id.author_name);
+            authorImage = (ImageView) itemView.findViewById(R.id.head_picture);
         }
     }
 
@@ -55,6 +60,8 @@ public class JokeAdapter extends RecyclerView.Adapter<JokeAdapter.ViewHolder> {
         Joke joke = mJokeList.get(position);
         holder.jokeText.setText(joke.getJokeText());
         holder.jokeStatus.setText(joke.getJokeStatus());
+        holder.authorName.setText(joke.getJokeAuthor());
+        Glide.with(mContext).load(joke.getHeadPhotoUrl()).transform(new GlideCircleTransform(mContext)).into(holder.authorImage);
         if (joke.getJokeImageUrl() != null) {
             holder.jokeImage.setVisibility(View.VISIBLE);
             Glide.with(mContext).load(joke.getJokeImageUrl()).into(holder.jokeImage);

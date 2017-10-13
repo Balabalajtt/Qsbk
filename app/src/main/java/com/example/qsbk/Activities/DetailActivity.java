@@ -66,6 +66,8 @@ public class DetailActivity extends AppCompatActivity {
         mJokeDetail = new JokeDetail();
         mJokeDetail.setJokeImage(joke.getJokeImageUrl());
         mJokeDetail.setJokeStatus(joke.getJokeStatus());
+        mJokeDetail.setJokeAuthor(joke.getJokeAuthor());
+        mJokeDetail.setHeadPhotoUrl(joke.getHeadPhotoUrl());
 
         requestDate();
 
@@ -98,13 +100,23 @@ public class DetailActivity extends AppCompatActivity {
                 });
 
 
+                Comment comment = new Comment();
+                comment.setCommentBody("评论 :");
+                mCommentList.add(comment);
+
                 Elements elements = document.getElementsByClass("body");
                 for (Element e : elements) {
-
                     Comment c = new Comment();
                     c.setCommentBody(e.select("span").text());
+                    c.setReport(e.parent().parent().getElementsByClass("report").get(0).text());
                     mCommentList.add(c);
                 }
+                if (mCommentList.size() == 1) {
+                    mCommentList.remove(0);
+                    comment.setCommentBody("暂无评论");
+                    mCommentList.add(comment);
+                }
+
                 mJokeDetail.setCommentList(mCommentList);
                 Log.d("666", "run: " + mJokeDetail.getCommentList().size());
                 handler.sendEmptyMessage(0);

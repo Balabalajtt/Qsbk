@@ -34,6 +34,8 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private String jokeImageUrl = null;
     private String jokeText = null;
     private String jokeStatus = null;
+    private String jokeAuthor = null;
+    private String jokeHeadUrl = null;
 
 
     public MultipleItemAdapter(Context context, JokeDetail jokeDetail) {
@@ -44,7 +46,8 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         jokeText = mJokeDetail.getJokeText();
         jokeImageUrl = mJokeDetail.getJokeImage();
         jokeStatus = mJokeDetail.getJokeStatus();
-
+        jokeAuthor = mJokeDetail.getJokeAuthor();
+        jokeHeadUrl = mJokeDetail.getHeadPhotoUrl();
     }
 
     @Override
@@ -61,6 +64,8 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (holder instanceof JokeHolder) {
             ((JokeHolder) holder).mTextView.setText(jokeText);
             ((JokeHolder) holder).mJokeStatus.setText(jokeStatus);
+            ((JokeHolder) holder).authorName.setText(jokeAuthor);
+            Glide.with(mContext).load(jokeHeadUrl).into(((JokeHolder) holder).authorImage);
             if (jokeImageUrl != null) {
                 ((JokeHolder) holder).mImageView.setVisibility(View.VISIBLE);
                 Glide.with(mContext).load(jokeImageUrl).into(((JokeHolder) holder).mImageView);
@@ -68,11 +73,12 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 ((JokeHolder) holder).mImageView.setVisibility(View.GONE);
             }
         } else if (holder instanceof CommentHolder) {
-            if (jokeImageUrl == null) {
-                ((CommentHolder) holder).mTextView.setText(mCommentList.get(position - 1).getCommentBody());
+            if (position > 1) {
+                ((CommentHolder) holder).reportNum.setText((mCommentList.get(position - 1).getReport() + "楼"));
             } else {
-                ((CommentHolder) holder).mTextView.setText(mCommentList.get(position - 1).getCommentBody());
+                ((CommentHolder) holder).reportNum.setText("");
             }
+                ((CommentHolder) holder).mTextView.setText(mCommentList.get(position - 1).getCommentBody());
         }
     }
 
@@ -97,9 +103,11 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public static class CommentHolder extends RecyclerView.ViewHolder {
         TextView mTextView;
+        TextView reportNum;
         CommentHolder(View view) {
             super(view);
             mTextView = (TextView) view.findViewById(R.id.comment_text);
+            reportNum = (TextView) view.findViewById(R.id.comment_report);
         }
     }
 
@@ -108,11 +116,15 @@ public class MultipleItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView mTextView;
         ImageView mImageView;
         TextView mJokeStatus;
+        ImageView authorImage;
+        TextView authorName;
         JokeHolder(View view) {
             super(view);
             mTextView = (TextView) view.findViewById(R.id.joke_text);
             mImageView = (ImageView) view.findViewById(R.id.joke_image);
             mJokeStatus = (TextView) view.findViewById(R.id.joke_status);
+            authorName = (TextView) view.findViewById(R.id.author_name);
+            authorImage = (ImageView) view.findViewById(R.id.head_picture);
         }
     }
 

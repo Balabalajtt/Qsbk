@@ -13,6 +13,26 @@ public class JokeDetail {
 
     private String mJokeStatus;
 
+    private String jokeAuthor;
+
+    public String getJokeAuthor() {
+        return jokeAuthor;
+    }
+
+    public void setJokeAuthor(String jokeAuthor) {
+        this.jokeAuthor = jokeAuthor;
+    }
+
+    public String getHeadPhotoUrl() {
+        return headPhotoUrl;
+    }
+
+    public void setHeadPhotoUrl(String headPhotoUrl) {
+        this.headPhotoUrl = headPhotoUrl;
+    }
+
+    private String headPhotoUrl;
+
     public String getJokeStatus() {
         return mJokeStatus;
     }

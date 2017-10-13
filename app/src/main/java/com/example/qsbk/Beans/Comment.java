@@ -7,7 +7,7 @@ package com.example.qsbk.Beans;
 public class Comment {
     private String commentBody;
 
-    private int report;
+    private String report;
 
     public String getCommentBody() {
         return commentBody;
@@ -17,11 +17,11 @@ public class Comment {
         this.commentBody = commentBody;
     }
 
-    public int getReport() {
+    public String getReport() {
         return report;
     }
 
-    public void setReport(int report) {
+    public void setReport(String report) {
         this.report = report;
     }
 
