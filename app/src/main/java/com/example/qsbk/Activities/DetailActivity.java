@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import com.example.qsbk.Adapters.MultipleItemAdapter;
 import com.example.qsbk.Beans.Comment;
@@ -41,6 +43,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private MultipleItemAdapter mMultipleItemAdapter;
 
+    private Toolbar mToolbar;
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -54,11 +58,29 @@ public class DetailActivity extends AppCompatActivity {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         mContext = this;
+
+        mToolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setNavigationIcon(R.mipmap.backup);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        mToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mRecyclerView.smoothScrollToPosition(0);
+            }
+        });
+
 
         Joke joke = (Joke) getIntent().getSerializableExtra("joke");
         detailUrl = joke.getDetailUrl();

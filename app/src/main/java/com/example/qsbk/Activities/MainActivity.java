@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayoutManager;
     private JokeAdapter mJokeAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private Toolbar mToolbar;
 
     private Handler handler = new Handler() {
         @Override
@@ -75,6 +77,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mToolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mJokeList.isEmpty()) {
+                    mRecyclerView.smoothScrollToPosition(0);
+                }
+            }
+        });
 
         //初始recyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -117,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         //刷新
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
